@@ -1,5 +1,6 @@
-def medi_score_calculation(air_or_oxygen, consciousness, respiration_rate, spo2, temperature, cbg, fasting):
-# last two parameters are for the CBG bonus task
+def medi_score_calculation(air_or_oxygen, consciousness, respiration_rate, spo2, temperature, cbg, fasting, previous_scores):
+# cbg and fasting parameters are for the CBG bonus task
+# previous_scores is for the alerting for trends in medi score bonus task (list of previous medi scores within last 24 hours)
 
     medi_score = 0
 
@@ -87,23 +88,25 @@ def medi_score_calculation(air_or_oxygen, consciousness, respiration_rate, spo2,
         elif cbg >= 9.0:
             medi_score += 3
 
+    
+    # Alerting for trends in medi score bonus task
+    increased_score = any(prev_score <= medi_score -2 for prev_score in previous_scores)
+    
+    return medi_score, increased_score
 
-    return medi_score
 
-
-# Examples (added last two arguments for the bonus task)
-patient1 = medi_score_calculation(0, 0, 15, 95, 37.1, 3.5, True)
-patient2 = medi_score_calculation(2, 0, 17, 96, 37.1, 5.5, False)
-patient3 = medi_score_calculation(2, 1, 23, 88, 38.5, 4.5, True)
+# Examples (added last three arguments for the bonus task)
+patient1 = medi_score_calculation(0, 0, 15, 95, 37.1, 5.0, True, [0,1])
+patient2 = medi_score_calculation(2, 0, 17, 96, 37.1, 5.5, False, [2,3])
+patient3 = medi_score_calculation(2, 1, 23, 88, 38.5, 4.5, True, [4,6])
 
 
 # Test cases
-# Before bonus task (without cbg and fasting)
-print("Patient 1's medi score is:", patient1) # 0
-print("Patient 2's medi score is:", patient2) # 4
-print("Patient 3's medi score is:", patient3) # 8
+# Outputs after both bonus tasks (without cbg and fasting)
+print("Patient 1's medi score is:", patient1) # 0, False
+print("Patient 2's medi score is:", patient2) # 6, True
+print("Patient 3's medi score is:", patient3) # 8, True
 
-# Outputs are 2, 6, 8 after bonus task (adding cbg and fasting)
 
 
     
